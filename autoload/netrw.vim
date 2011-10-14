@@ -859,9 +859,19 @@ fun! netrw#NetRead(mode,...)
     " -n  win32: quit being obnoxious about password
     keepj norm! 1Gdd
 "    call Decho("executing: %!".s:netrw_ftp_cmd." -i -n")
+    let oldbuf = getline(1, '$')
     exe s:netrw_silentxfer."%!".s:netrw_ftp_cmd." -i -n"
     " If the result of the ftp operation isn't blank, show an error message (tnx to Doug Claar)
-    if getline(1) !~ "^$"
+    let i = 0
+    let identical = 1
+    for line in getline(1, '$')
+        if line !=# oldbuf[i]
+            let identical = 0
+            break
+        endif
+        let i += 1
+    endfor
+    if getline(1) !~ "^$" && !identical
 "     call Decho("error<".getline(1).">")
      if !exists("g:netrw_quiet")
       call netrw#ErrorMsg(s:ERROR,getline(1),5)
@@ -1265,9 +1275,19 @@ fun! netrw#NetWrite(...) range
     " -n  win32: quit being obnoxious about password
     keepj norm! 1Gdd
 "    call Decho("executing: %!".s:netrw_ftp_cmd." -i -n")
+    let oldbuf = getline(1, '$')
     exe s:netrw_silentxfer."%!".s:netrw_ftp_cmd." -i -n"
+    let i = 0
+    let identical = 1
+    for line in getline(1, '$')
+        if line !=# oldbuf[i]
+            let identical = 0
+            break
+        endif
+        let i += 1
+    endfor
     " If the result of the ftp operation isn't blank, show an error message (tnx to Doug Claar)
-    if getline(1) !~ "^$"
+    if getline(1) !~ "^$" && !identical
      if  !exists("g:netrw_quiet")
       call netrw#ErrorMsg(s:ERROR,getline(1),15)
      endif
